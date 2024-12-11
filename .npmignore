@@ -1,0 +1,8 @@
+# .npmignore
+src/
+*.ts
+*.tsx
+tsconfig*
+vite.config*
+eslint.config.js
+index.html

@@ -1,13 +1,14 @@
 {
   "name": "audio-visualizer.js",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:types": "tsc --project tsconfig.app.json"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -32,7 +33,7 @@
   },
   "main": "./dist/audio-visualizer.umd.js",
   "module": "./dist/audio-visualizer.es.js",
-  "types": "dist/types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/audio-visualizer.es.js",
@@ -53,5 +54,8 @@
   "bugs": {
     "url": "https://github.com/theobourgeois/AudioVisualizer.js/issues"
   },
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/theobourgeois/AudioVisualizer.js#readme"
 }

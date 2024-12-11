@@ -25,25 +25,7 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      insertTypesEntry: true, // Automatically adds a "types" entry in your package.json
-      outDir: "dist/types", // Output directory for generated types
-      include: ["src/components/**/*.ts", "src/components/**/*.tsx"], // Include all relevant source files
-      rollupTypes: true,
-      compilerOptions: {
-        paths: {
-          "three": ["node_modules/three/src/Three.d.ts"]
-        }
-      },
-      beforeWriteFile: (filePath, content) => {
-        console.log(`Generating types for: ${filePath}`); // Logging to check files being processed
-        return {
-          filePath: filePath.replace("src/components", "dist/types"), // Replace the path to your desired output folder
-          content,
-        };
-      },
-      afterBuild: () => {
-        console.log("Types have been generated!"); // Confirm types generation
-      }
+      insertTypesEntry: true,
     }),
   ],
 });
