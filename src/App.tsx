@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { AudioVisualizer, AudioVisualizerRef } from "./utils/audio-visualizer";
+import { AudioVisualizerRef, AudioVisualizer } from "./components";
 
 function App() {
     const visRef = useRef<AudioVisualizerRef>(null);

@@ -1,12 +1,7 @@
 import * as THREE from "three";
+import { DefaultValues, Preset, RenderFunc, ShapeBase, WaveformBase } from "./types";
 
-export type Preset =
-  | "Shape2D"
-  | "Shape3D"
-  | "Light"
-  | "Waveform"
-  | "LineWaveform";
-export const SHAPES_2D = [
+const SHAPES_2D = [
   "circle",
   "square",
   "triangle",
@@ -14,7 +9,7 @@ export const SHAPES_2D = [
   "hexagon",
   "octagon",
 ] as const;
-export const SHAPES_3D = [
+const SHAPES_3D = [
   "cube",
   "sphere",
   "torus",
@@ -23,106 +18,8 @@ export const SHAPES_3D = [
   "octahedron",
   "tetrahedron",
 ] as const;
-export const LIGHT_TYPE = ["point", "spot", "directional", "ambient"] as const;
 
-export type PresetBase = object;
-
-export type ShapeBase = PresetBase & {
-  color?: string;
-  speed?: number;
-  opacity?: number;
-  amplitude?: number;
-  x?: number;
-  y?: number;
-  z?: number;
-  size?: number;
-  castShadow?: boolean;
-  receiveShadow?: boolean;
-};
-
-export type Light = {
-  color?: THREE.ColorRepresentation;
-  type?: (typeof LIGHT_TYPE)[number];
-  intensity?: number;
-  position?: [number, number, number];
-};
-
-type WaveformBase = PresetBase & {
-  color?: THREE.ColorRepresentation;
-  opacity?: number;
-  amplitude?: number;
-  period?: number;
-  x?: number;
-  y?: number;
-  z?: number;
-  width?: number;
-  height?: number;
-  lineWidth?: number;
-  invert?: boolean;
-};
-
-export type Waveform = WaveformBase;
-export type LineWaveform = WaveformBase;
-
-export type Shape2D = ShapeBase & {
-  shape?: (typeof SHAPES_2D)[number];
-  rotationAmplitude?: number;
-};
-
-export type Shape3D = ShapeBase & {
-  shape?: (typeof SHAPES_3D)[number];
-  rotationXAmplitude?: number;
-  rotationYAmplitude?: number;
-  rotationZAmplitude?: number;
-};
-
-// Define LayerSettings based on Preset
-export type LayerSettings<T extends Preset> = T extends "Shape2D"
-  ? Shape2D
-  : T extends "Shape3D"
-  ? Shape3D
-  : T extends "Light"
-  ? Light
-  : T extends "Waveform"
-  ? Waveform
-  : T extends "LineWaveform"
-  ? LineWaveform
-  : never;
-
-// Define the Layer type with proper discrimination
-export type Layer<T extends Preset> = {
-  preset: T;
-  settings: LayerSettings<T>;
-};
-
-// This allows multiple layers of each preset type
-export type Config = {
-  layers: Array<
-    | Layer<"Shape2D">
-    | Layer<"Shape3D">
-    | Layer<"Light">
-    | Layer<"Waveform">
-    | Layer<"LineWaveform">
-  >;
-};
-
-type ThreeJS = {
-  camera: THREE.Camera;
-  scene: THREE.Scene;
-  renderer: THREE.WebGLRenderer;
-};
-
-export type RenderFunc<T extends Preset> = (
-  settings: LayerSettings<T>,
-  three: ThreeJS,
-  audioData: Uint8Array,
-  id: string
-) => void;
-
-type DefaultValues = {
-  [P in Preset]: Required<LayerSettings<P>>;
-};
-
+const LIGHT_TYPE = ["point", "spot", "directional", "ambient"] as const;
 const presetDefaults = {
   highCut: 0,
   lowCut: 0,
@@ -398,7 +295,7 @@ const renderLineWaveform: RenderFunc<"LineWaveform"> = (
   mesh.geometry.attributes.position.needsUpdate = true;
 };
 
-export const renderFuncs: {
+const renderFuncs: {
   [P in Preset]: RenderFunc<P>;
 } = {
   Shape2D: renderShape2D,
@@ -406,4 +303,11 @@ export const renderFuncs: {
   Light: renderLight,
   Waveform: renderWaveform,
   LineWaveform: renderLineWaveform,
+} as const;
+
+export {
+  renderFuncs,
+  SHAPES_2D,
+  SHAPES_3D,
+  LIGHT_TYPE
 };

@@ -1,22 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
-import { Config, renderFuncs } from "./render";
-
-// Props for the AudioVisualizer
-export type AudioVisualizerProps = {
-    audioRef?: React.RefObject<HTMLAudioElement>;
-    src?: string;
-    style: React.CSSProperties;
-    className?: string;
-    config: Config;
-    backgroundColor?: string;
-};
-
-export type AudioVisualizerRef = {
-    play: () => void;
-    pause: () => void;
-    getAudioElement: () => HTMLAudioElement | null | undefined;
-};
+import { renderFuncs } from "./render";
+import { AudioVisualizerProps, AudioVisualizerRef } from "./types";
 
 const AudioVisualizerWrapper = forwardRef(function AudioVisualizerWrapper(
     props: AudioVisualizerProps,
