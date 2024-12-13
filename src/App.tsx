@@ -59,11 +59,21 @@ function App() {
                             },
                         },
                         {
+                            preset: "Shape3D",
+                            settings: {
+                                shape: "cube",
+                                color: "white",
+                                size: 1,
+                                rotationXAmplitude: 10,
+                                rotationYAmplitude: 10,
+                            },
+                        },
+                        {
                             preset: "Light",
                             settings: {
                                 type: "directional",
                                 color: "white",
-                                intensity: 5,
+                                intensity: 1,
                                 position: [0, 0, 1],
                             },
                         },

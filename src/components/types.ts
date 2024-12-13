@@ -77,19 +77,21 @@ type Layer<T extends Preset> = {
   settings: LayerSettings<T>;
 };
 
+export type Layers = Array<
+  | Layer<"Shape2D">
+  | Layer<"Shape3D">
+  | Layer<"Light">
+  | Layer<"Waveform">
+  | Layer<"LineWaveform">
+>;
+
 // This allows multiple layers of each preset type
 type Config = {
-  layers: Array<
-    | Layer<"Shape2D">
-    | Layer<"Shape3D">
-    | Layer<"Light">
-    | Layer<"Waveform">
-    | Layer<"LineWaveform">
-  >;
+  layers: Layers;
 };
 
-type ThreeJS = {
-  camera: THREE.Camera;
+export type ThreeJS = {
+  camera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
 };
@@ -109,7 +111,7 @@ export type DefaultValues = {
 export type AudioVisualizerProps = {
   audioRef?: React.RefObject<HTMLAudioElement>;
   src?: string;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   className?: string;
   config: Config;
   backgroundColor?: string;
