@@ -84,7 +84,7 @@ The `config` prop defines the visualizer layers. Each layer includes a `preset` 
 #### **Shape2D**
 | Setting            | Type     | Description                        |
 |--------------------|----------|------------------------------------|
-| `shape`            | `"circle" | "square" | "triangle"` | Shape of the 2D object.             |
+| `shape`            | `"circle" \| "square" \| "triangle"` | Shape of the 2D object.             |
 | `color`            | `string` | Color of the shape.                |
 | `speed`            | `number` | Animation speed.                   |
 | `size`             | `number` | Size of the shape.                 |
@@ -92,7 +92,7 @@ The `config` prop defines the visualizer layers. Each layer includes a `preset` 
 #### **Shape3D**
 | Setting             | Type                | Description                       |
 |---------------------|---------------------|-----------------------------------|
-| `shape`             | `"cube" | "sphere" | "torus" | "dodecahedron" | "icosahedron"` | 3D shape type.       |
+| `shape`             | `"cube" \| "sphere" \| "torus" \| "dodecahedron" \| "icosahedron"` | 3D shape type.       |
 | `color`             | `string`           | Color of the shape.               |
 | `rotationXAmplitude`| `number`           | Amplitude of rotation on X-axis.  |
 | `rotationYAmplitude`| `number`           | Amplitude of rotation on Y-axis.  |
@@ -110,7 +110,7 @@ The `config` prop defines the visualizer layers. Each layer includes a `preset` 
 | Setting     | Type                                     | Description                          |
 |-------------|------------------------------------------|--------------------------------------|
 | `color`     | `string`                                | Light color.                         |
-| `type`      | `"ambient" | "directional" | "point" | "spot"` | Type of light.                      |
+| `type`      | `"ambient" \| "directional" \| "point" \| "spot"` | Type of light.                      |
 | `intensity` | `number`                                | Light intensity.                     |
 | `position`  | `[number, number, number]`              | Position of the light in 3D space.   |
 
