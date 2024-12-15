@@ -37,7 +37,16 @@ const defaultConfig: Config = [
             type: "point",
             color: "white",
             intensity: 10,
-            position: [0, 0, 2],
+        },
+    },
+    {
+        preset: "shape",
+        settings: {
+            shape: "cube",
+            domainType: "frequency",
+            color: "red",
+            amplitude: 1,
+            rotationXAmplitude: 1,
         },
     },
 ];
@@ -60,6 +69,7 @@ function App() {
         (e: React.ChangeEvent<HTMLInputElement>) => {
             let value: string | number | symbol = e.target.value;
             value = isNaN(parseFloat(value)) ? value : parseFloat(value);
+            // @ts-expect-error - TS doesn't know that the preset is a valid key
             setConfig((prev) => {
                 return prev.map((layer) => {
                     if (layer.preset === preset) {

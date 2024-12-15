@@ -14,7 +14,7 @@ export const SHAPES = [
 export const LIGHT_TYPES = ["point", "spot", "directional", "ambient"] as const;
 export const PRESETS =
   ["shape", "light", "waveform", "line-waveform", "text"] as const;
-export const FONTS = ["roboto", "helvetiker", "optimer", "gentilis", "droid", "droid_bold"] as const;
+export const FONTS = ["helvetiker", "optimer", "gentilis", "droid", "droid_bold"] as const;
 
 export type Preset = typeof PRESETS[number];
 export type Transform = {
@@ -24,6 +24,9 @@ export type Transform = {
   rotationX?: number;
   rotationY?: number;
   rotationZ?: number;
+  maxRotationX?: number;
+  maxRotationY?: number;
+  maxRotationZ?: number;
 }
 
 export type PresetBase = {
@@ -61,11 +64,10 @@ export type Text = PresetBase & Transform & {
   amplitude?: number;
 };
 
-export type Light = {
+export type Light = Transform & {
   color?: string;
   type?: typeof LIGHT_TYPES[number];
   intensity?: number;
-  position?: [number, number, number];
 };
 
 export type WaveformBase = PresetBase & Transform & {
@@ -136,6 +138,7 @@ export type AudioVisualizerProps = {
   className?: string;
   config: Config;
   backgroundColor?: DataType.Color;
+  delayPerFrame?: number;
 };
 
 export type AudioVisualizerRef = {

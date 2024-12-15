@@ -175,7 +175,11 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         const { scene, camera, renderer } = threeRef.current!;
         const animate = () => {
             const config = configRef.current;
-            requestAnimationFrame(animate);
+            if (props.delayPerFrame) {
+                setTimeout(() => {
+                    requestAnimationFrame(animate);
+                }, props.delayPerFrame);
+            }
 
             config.forEach((layer) => {
                 if ("domainType" in layer.settings) {
@@ -201,7 +205,7 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         };
 
         animate();
-    }, []);
+    }, [props.delayPerFrame]);
 
     return (
         <div

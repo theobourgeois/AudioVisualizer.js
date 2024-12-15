@@ -1,7 +1,7 @@
 {
   "name": "audio-visualizer.js",
   "private": false,
-  "version": "0.0.10",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,8 +11,8 @@
     "build:types": "tsc --project tsconfig.app.json"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "three": "^0.171.0",
     "vite-plugin-dts": "^4.3.0"
   },
