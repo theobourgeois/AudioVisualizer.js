@@ -48,7 +48,8 @@
   },
   "keywords": [
     "audio",
-    "visualizer"
+    "visualizer",
+    "react"
   ],
   "author": "Theo Bourgeois",
   "license": "ISC",

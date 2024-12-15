@@ -1,9 +1,50 @@
 import { useRef } from "react";
-import { AudioVisualizerRef, AudioVisualizer } from "./components";
+import {
+    AudioVisualizerRef,
+    AudioVisualizer,
+    defaultValues,
+    Preset,
+    Config,
+} from "./components";
 import React from "react";
+
+const defaultConfig: Config = [
+    {
+        preset: "waveform",
+        settings: {
+            color: "white",
+            domainType: "time",
+            amplitude: 90,
+            resolution: 0.3,
+            circle: true,
+            radius: 3,
+        },
+    },
+    {
+        preset: "text",
+        settings: {
+            text: "Hello World",
+            domainType: "frequency",
+            font: "helvetiker",
+            color: "pink",
+            amplitude: 1,
+            rotationXAmplitude: 1,
+        },
+    },
+    {
+        preset: "light",
+        settings: {
+            type: "point",
+            color: "white",
+            intensity: 10,
+            position: [0, 0, 2],
+        },
+    },
+];
 
 function App() {
     const visRef = useRef<AudioVisualizerRef>(null);
+    const [config, setConfig] = React.useState<Config>(defaultConfig);
 
     const handleChangeProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -13,6 +54,27 @@ function App() {
                 (audioElement.duration / 100) * parseInt(value);
         }
     };
+
+    const handleChange =
+        (preset: string, setting: string) =>
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            let value: string | number | symbol = e.target.value;
+            value = isNaN(parseFloat(value)) ? value : parseFloat(value);
+            setConfig((prev) => {
+                return prev.map((layer) => {
+                    if (layer.preset === preset) {
+                        return {
+                            ...layer,
+                            settings: {
+                                ...layer.settings,
+                                [setting]: value,
+                            },
+                        };
+                    }
+                    return layer;
+                });
+            });
+        };
 
     return (
         <>
@@ -28,6 +90,44 @@ function App() {
                 }}
                 onChange={handleChangeProgress}
             />
+            <div style={{ display: "flex" }}>
+                {config.map((conf, index) => {
+                    const presetKey = conf.preset;
+                    const settings = defaultValues[presetKey as Preset];
+                    return (
+                        <div key={conf + String(index)}>
+                            <div>
+                                <h3>{presetKey}</h3>
+                                {Object.entries(settings).map(
+                                    ([settingKey, settingsValue], i) => {
+                                        return (
+                                            <div key={settingKey + String(i)}>
+                                                <span>{settingKey}:</span>
+                                                <input
+                                                    type="text"
+                                                    onChange={handleChange(
+                                                        presetKey,
+                                                        settingKey
+                                                    )}
+                                                    value={
+                                                        config.find(
+                                                            (layer) =>
+                                                                layer.preset ===
+                                                                presetKey
+                                                        )?.settings[
+                                                            settingKey
+                                                        ] ?? settingsValue
+                                                    }
+                                                />
+                                            </div>
+                                        );
+                                    }
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
             <AudioVisualizer
                 style={{
                     marginLeft: "25vw",
@@ -36,49 +136,8 @@ function App() {
                 }}
                 ref={visRef}
                 src="/audio.mp3"
-                backgroundColor={"darkred"}
-                config={{
-                    layers: [
-                        {
-                            preset: "Waveform",
-                            settings: {
-                                color: "#ff0000",
-                                lineWidth: 2,
-                                amplitude: 10,
-                                period: 0.5,
-                                invert: true,
-                            },
-                        },
-                        {
-                            preset: "LineWaveform",
-                            settings: {
-                                color: "white",
-                                lineWidth: 1,
-                                amplitude: 10,
-                                y: -0.4,
-                            },
-                        },
-                        {
-                            preset: "Shape3D",
-                            settings: {
-                                shape: "cube",
-                                color: "white",
-                                size: 1,
-                                rotationXAmplitude: 10,
-                                rotationYAmplitude: 10,
-                            },
-                        },
-                        {
-                            preset: "Light",
-                            settings: {
-                                type: "directional",
-                                color: "white",
-                                intensity: 1,
-                                position: [0, 0, 1],
-                            },
-                        },
-                    ],
-                }}
+                backgroundColor="cornflowerblue"
+                config={config}
             />
         </>
     );

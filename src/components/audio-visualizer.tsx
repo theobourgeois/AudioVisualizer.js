@@ -3,6 +3,16 @@ import * as THREE from "three";
 import { renderFuncs } from "./render";
 import { AudioVisualizerProps, AudioVisualizerRef, ThreeJS } from "./types";
 
+// Generator for unique IDs
+function* idGenerator() {
+    let id = 0;
+    while (true) {
+        yield ++id;
+    }
+}
+const idGen = idGenerator();
+const getNewId = () => idGen.next().value as number;
+
 const AudioVisualizerWrapper = forwardRef(function AudioVisualizerWrapper(
     props: AudioVisualizerProps,
     ref: React.Ref<AudioVisualizerRef>
@@ -15,7 +25,7 @@ const AudioVisualizerWrapper = forwardRef(function AudioVisualizerWrapper(
         throw new Error("audioRef and src cannot be provided at the same time");
     }
 
-    if (props.config.layers.length === 0) {
+    if (props.config.length === 0) {
         throw new Error("config must contain at least one layer");
     }
 
@@ -81,6 +91,11 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
     const trackRef = useRef<MediaElementAudioSourceNode | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const threeRef = useRef<ThreeJS | null>(null);
+    const configRef = useRef(props.config);
+
+    useEffect(() => {
+        configRef.current = props.config;
+    }, [props.config]);
 
     useEffect(() => {
         if (threeRef.current) return;
@@ -154,21 +169,31 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         return () => {
             window.removeEventListener("resize", handleResize);
         };
-    }, [threeRef]);
+    }, []);
 
     useEffect(() => {
         const { scene, camera, renderer } = threeRef.current!;
         const animate = () => {
+            const config = configRef.current;
             requestAnimationFrame(animate);
-            analyser.getByteFrequencyData(dataArray);
 
-            props.config.layers.forEach((layer, i) => {
+            config.forEach((layer) => {
+                if ("domainType" in layer.settings) {
+                    if (layer.settings.domainType === "time") {
+                        analyser.getByteTimeDomainData(dataArray);
+                    } else {
+                        analyser.getByteFrequencyData(dataArray);
+                    }
+                }
+                if (!layer.id) {
+                    layer.id = getNewId();
+                }
                 renderFuncs[layer.preset](
                     // @ts-expect-error - TS doesn't know that the preset is valid
                     layer.settings,
                     { scene, camera, renderer },
                     dataArray,
-                    `layer-${i}`
+                    `layer-${layer.id}`
                 );
             });
 
@@ -176,7 +201,7 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         };
 
         animate();
-    }, [props.config.layers, threeRef]);
+    }, []);
 
     return (
         <div

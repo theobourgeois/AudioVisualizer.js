@@ -86,8 +86,8 @@ The `config` prop defines the visualizer layers. Each layer includes a `preset` 
 |--------------------|----------|------------------------------------|
 | `shape`            | `"circle" \| "square" \| "triangle"` | Shape of the 2D object.             |
 | `color`            | `string` | Color of the shape.                |
-| `speed`            | `number` | Animation speed.                   |
 | `size`             | `number` | Size of the shape.                 |
+| `rotationAmplitude`             | `number` | Amplitude of rotation.                 |
 
 #### **Shape3D**
 | Setting             | Type                | Description                       |

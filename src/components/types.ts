@@ -1,44 +1,81 @@
 import * as THREE from "three";
+import { DataType } from "csstype"
 
-export type Preset =
-  | "Shape2D"
-  | "Shape3D"
-  | "Light"
-  | "Waveform"
-  | "LineWaveform";
+export const SHAPES = [
+  "cube",
+  "sphere",
+  "torus",
+  "dodecahedron",
+  "icosahedron",
+  "octahedron",
+  "tetrahedron",
+] as const;
 
-type PresetBase = object;
+export const LIGHT_TYPES = ["point", "spot", "directional", "ambient"] as const;
+export const PRESETS =
+  ["shape", "light", "waveform", "line-waveform", "text"] as const;
+export const FONTS = ["roboto", "helvetiker", "optimer", "gentilis", "droid", "droid_bold"] as const;
 
-export type ShapeBase = PresetBase & {
-  color?: string;
-  speed?: number;
-  opacity?: number;
-  amplitude?: number;
+export type Preset = typeof PRESETS[number];
+export type Transform = {
   x?: number;
   y?: number;
   z?: number;
+  rotationX?: number;
+  rotationY?: number;
+  rotationZ?: number;
+}
+
+export type PresetBase = {
+  domainType?: "time" | "frequency";
+}
+
+export type Shape = PresetBase & Transform & {
+  shape?: typeof SHAPES[number];
+  rotationXAmplitude?: number;
+  rotationYAmplitude?: number;
+  rotationZAmplitude?: number;
+  color?: string;
+  opacity?: number;
+  amplitude?: number;
   size?: number;
   castShadow?: boolean;
   receiveShadow?: boolean;
 };
 
+export type Text = PresetBase & Transform & {
+  color: string;
+  text: string;
+  font?: typeof FONTS[number];
+  size?: number;
+  rotationXAmplitude?: number;
+  rotationYAmplitude?: number;
+  rotationZAmplitude?: number;
+  bevelEnabled?: boolean;
+  bevelThickness?: number;
+  bevelSize?: number;
+  bevelSegments?: number;
+  curveSegments?: number;
+  steps?: number;
+  depth?: number;
+  amplitude?: number;
+};
+
 export type Light = {
   color?: string;
-  type?: "ambient" | "directional" | "point" | "spot";
+  type?: typeof LIGHT_TYPES[number];
   intensity?: number;
   position?: [number, number, number];
 };
 
-export type WaveformBase = PresetBase & {
+export type WaveformBase = PresetBase & Transform & {
   color?: string;
+  resolution?: number;
   opacity?: number;
   amplitude?: number;
-  period?: number;
-  x?: number;
-  y?: number;
-  z?: number;
-  width?: number;
-  height?: number;
+  circle?: boolean;
+  circleRadiusRatio?: number; // 0-1
+  radius?: number;
   lineWidth?: number;
   invert?: boolean;
 };
@@ -46,49 +83,33 @@ export type WaveformBase = PresetBase & {
 type Waveform = WaveformBase;
 type LineWaveform = WaveformBase;
 
-type Shape2D = ShapeBase & {
-  shape?: "circle" | "square" | "triangle";
-  rotationAmplitude?: number;
-};
-
-type Shape3D = ShapeBase & {
-  shape?: "cube" | "sphere" | "torus" | "dodecahedron" | "icosahedron";
-  rotationXAmplitude?: number;
-  rotationYAmplitude?: number;
-  rotationZAmplitude?: number;
-};
-
 // Define LayerSettings based on Preset
-type LayerSettings<T extends Preset> = T extends "Shape2D"
-  ? Shape2D
-  : T extends "Shape3D"
-  ? Shape3D
-  : T extends "Light"
+export type LayerSettings<T extends Preset> = T extends "shape"
+  ? Shape
+  : T extends "light"
   ? Light
-  : T extends "Waveform"
+  : T extends "waveform"
   ? Waveform
-  : T extends "LineWaveform"
+  : T extends "line-waveform"
   ? LineWaveform
+  : T extends "text"
+  ? Text
   : never;
 
 // Define the Layer type with proper discrimination
 type Layer<T extends Preset> = {
+  id?: number;
   preset: T;
   settings: LayerSettings<T>;
 };
 
-export type Layers = Array<
-  | Layer<"Shape2D">
-  | Layer<"Shape3D">
-  | Layer<"Light">
-  | Layer<"Waveform">
-  | Layer<"LineWaveform">
+export type Config = Array<
+  | Layer<"shape">
+  | Layer<"light">
+  | Layer<"waveform">
+  | Layer<"line-waveform">
+  | Layer<"text">
 >;
-
-// This allows multiple layers of each preset type
-type Config = {
-  layers: Layers;
-};
 
 export type ThreeJS = {
   camera: THREE.PerspectiveCamera;
@@ -100,7 +121,7 @@ export type RenderFunc<T extends Preset> = (
   settings: LayerSettings<T>,
   three: ThreeJS,
   audioData: Uint8Array,
-  id: string
+  id: string,
 ) => void;
 
 export type DefaultValues = {
@@ -114,7 +135,7 @@ export type AudioVisualizerProps = {
   style?: React.CSSProperties;
   className?: string;
   config: Config;
-  backgroundColor?: string;
+  backgroundColor?: DataType.Color;
 };
 
 export type AudioVisualizerRef = {
