@@ -26,6 +26,16 @@ export default defineConfig({
     react(),
     dts({
       insertTypesEntry: true,
+      include: ['src/components/**/*.ts', 'src/components/**/*.tsx'],
+      exclude: ['node_modules/**'],
+      outDir: 'dist',
+      compilerOptions: {
+        declaration: true,
+        declarationMap: true,
+        emitDeclarationOnly: false,
+        noEmit: false,
+        composite: false
+      }
     }),
   ],
 });

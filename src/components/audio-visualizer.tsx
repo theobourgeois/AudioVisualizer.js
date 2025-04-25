@@ -1,5 +1,11 @@
 "use client";
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from "react";
 import * as THREE from "three";
 import { renderFuncs } from "./render";
 import { AudioVisualizerProps, AudioVisualizerRef, ThreeJS } from "./types";
@@ -48,6 +54,9 @@ const AudioVisualizerWithSrc = forwardRef(function AudioVisualizerWithSrc(
 });
 
 function setupAudioContext() {
+    // Only create AudioContext if we're in the browser
+    if (typeof window === "undefined") return null;
+
     const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
@@ -62,12 +71,26 @@ function setupAudioContext() {
     };
 }
 
-const { analyser, dataArray, audioContext } = setupAudioContext();
-
 const AudioVisualizer = forwardRef(function AudioVisualizer(
     props: Omit<AudioVisualizerProps, "src">,
     ref: React.Ref<AudioVisualizerRef>
 ) {
+    const [audioContext, setAudioContext] =
+        useState<ReturnType<typeof setupAudioContext>>(null);
+    const trackRef = useRef<MediaElementAudioSourceNode | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const threeRef = useRef<ThreeJS | null>(null);
+    const configRef = useRef(props.config);
+
+    useEffect(() => {
+        // Initialize AudioContext only on the client side
+        setAudioContext(setupAudioContext());
+    }, []);
+
+    useEffect(() => {
+        configRef.current = props.config;
+    }, [props.config]);
+
     useImperativeHandle(
         ref,
         () => ({
@@ -85,14 +108,41 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         }),
         [props.audioRef]
     );
-    const trackRef = useRef<MediaElementAudioSourceNode | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const threeRef = useRef<ThreeJS | null>(null);
-    const configRef = useRef(props.config);
 
     useEffect(() => {
-        configRef.current = props.config;
-    }, [props.config]);
+        if (!audioContext || !props.audioRef?.current) return;
+
+        const audioElement = props.audioRef.current as HTMLAudioElement;
+
+        const setupAudioTrack = async () => {
+            // Ensure audio context is in a valid state
+            if (audioContext.audioContext.state === "suspended") {
+                await audioContext.audioContext.resume();
+            }
+
+            // Check if the audio element is already connected
+            try {
+                if (!trackRef.current) {
+                    trackRef.current =
+                        audioContext.audioContext.createMediaElementSource(
+                            audioElement
+                        );
+                    trackRef.current?.connect(audioContext.analyser);
+                }
+            } catch (error) {
+                console.error("Error creating media element source:", error);
+            }
+        };
+
+        audioElement.addEventListener("play", setupAudioTrack);
+
+        return () => {
+            audioElement.removeEventListener("play", setupAudioTrack);
+            if (trackRef.current) {
+                trackRef.current.disconnect();
+            }
+        };
+    }, [props.audioRef, audioContext]);
 
     useEffect(() => {
         if (threeRef.current) return;
@@ -117,39 +167,6 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
 
         threeRef.current = { camera, scene, renderer };
     }, [props.backgroundColor]);
-
-    useEffect(() => {
-        if (!props.audioRef?.current) return;
-
-        const audioElement = props.audioRef.current as HTMLAudioElement;
-
-        const setupAudioTrack = async () => {
-            // Ensure audio context is in a valid state
-            if (audioContext.state === "suspended") {
-                await audioContext.resume();
-            }
-
-            // Check if the audio element is already connected
-            try {
-                if (!trackRef.current) {
-                    trackRef.current =
-                        audioContext.createMediaElementSource(audioElement);
-                    trackRef.current?.connect(analyser);
-                }
-            } catch (error) {
-                console.error("Error creating media element source:", error);
-            }
-        };
-
-        audioElement.addEventListener("play", setupAudioTrack);
-
-        return () => {
-            audioElement.removeEventListener("play", setupAudioTrack);
-            if (trackRef.current) {
-                trackRef.current.disconnect();
-            }
-        };
-    }, [props.audioRef]);
 
     useEffect(() => {
         const { camera, renderer, scene } = threeRef.current!;
@@ -197,6 +214,8 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
     }, []);
 
     useEffect(() => {
+        if (!audioContext) return;
+
         const { scene, camera, renderer } = threeRef.current!;
         const animate = () => {
             const config = configRef.current;
@@ -211,9 +230,13 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
             config.forEach((layer) => {
                 if ("domainType" in layer.settings) {
                     if (layer.settings.domainType === "time") {
-                        analyser.getByteTimeDomainData(dataArray);
+                        audioContext.analyser.getByteTimeDomainData(
+                            audioContext.dataArray
+                        );
                     } else {
-                        analyser.getByteFrequencyData(dataArray);
+                        audioContext.analyser.getByteFrequencyData(
+                            audioContext.dataArray
+                        );
                     }
                 }
                 if (!layer.id) {
@@ -223,7 +246,7 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
                     // @ts-expect-error - TS doesn't know that the preset is valid
                     layer.settings,
                     { scene, camera, renderer },
-                    dataArray,
+                    audioContext.dataArray,
                     `layer-${layer.id}`
                 );
             });
@@ -232,7 +255,7 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
         };
 
         animate();
-    }, [props.delayPerFrame]);
+    }, [props.delayPerFrame, audioContext]);
 
     return (
         <div

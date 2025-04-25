@@ -1,14 +1,15 @@
 {
   "name": "audio-visualizer.js",
   "private": false,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:npm": "npm run build && npx tsc --project tsconfig.app.json --declaration --emitDeclarationOnly --outDir dist",
+    "publish": "npm run build:npm && npm publish",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "build:types": "tsc --project tsconfig.app.json"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^19.0.0",
