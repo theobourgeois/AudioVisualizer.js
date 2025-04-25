@@ -1,3 +1,4 @@
+"use client";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
 import { renderFuncs } from "./render";
@@ -23,10 +24,6 @@ const AudioVisualizerWrapper = forwardRef(function AudioVisualizerWrapper(
 
     if (props.audioRef !== undefined && props.src !== undefined) {
         throw new Error("audioRef and src cannot be provided at the same time");
-    }
-
-    if (props.config.length === 0) {
-        throw new Error("config must contain at least one layer");
     }
 
     if (props.src !== undefined) {
@@ -155,19 +152,47 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
     }, [props.audioRef]);
 
     useEffect(() => {
-        const { camera, renderer } = threeRef.current!;
-        const handleResize = () => {
-            const newWidth = containerRef.current!.clientWidth;
-            const newHeight = containerRef.current!.clientHeight;
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newWidth, newHeight);
+        const { camera, renderer, scene } = threeRef.current!;
+        const container = containerRef.current!;
+
+        // Debounced resize handler
+        const debounce = (fn: (...args: unknown[]) => void, delay: number) => {
+            let timeout: NodeJS.Timeout;
+            return (...args: unknown[]) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
         };
 
-        window.addEventListener("resize", handleResize);
+        const handleResize = debounce(() => {
+            if (!container) return;
 
+            const newWidth = container.clientWidth;
+            const newHeight = container.clientHeight;
+
+            // Update camera properties
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+
+            // Update renderer properties
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(newWidth, newHeight);
+
+            // Optionally re-render the scene
+            renderer.render(scene, camera);
+        }, 100); // Debounce interval
+
+        // Create a ResizeObserver to observe changes in container size
+        const resizeObserver = new ResizeObserver(() => {
+            handleResize();
+        });
+
+        // Start observing the container
+        resizeObserver.observe(container);
+
+        // Cleanup the observer on unmount
         return () => {
-            window.removeEventListener("resize", handleResize);
+            resizeObserver.disconnect();
         };
     }, []);
 
@@ -179,6 +204,8 @@ const AudioVisualizer = forwardRef(function AudioVisualizer(
                 setTimeout(() => {
                     requestAnimationFrame(animate);
                 }, props.delayPerFrame);
+            } else {
+                requestAnimationFrame(animate);
             }
 
             config.forEach((layer) => {

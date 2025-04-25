@@ -13,9 +13,9 @@ const transformDefaults = {
     rotationX: 0,
     rotationY: 0,
     rotationZ: 0,
-    maxRotationX: Infinity,
-    maxRotationY: Infinity,
-    maxRotationZ: Infinity,
+    maxRotationX: 50,
+    maxRotationY: 50,
+    maxRotationZ: 50,
 };
 
 const presetDefaults: Required<PresetBase> = {
@@ -24,10 +24,10 @@ const presetDefaults: Required<PresetBase> = {
 
 const shapeDefault: Required<Shape> = {
     shape: "cube",
-    color: "#000000",
+    color: "white",
     opacity: 1,
     amplitude: 1,
-    castShadow: false,
+    castShadow: true,
     receiveShadow: true,
     size: 1,
     rotationXAmplitude: 0,
@@ -53,7 +53,7 @@ const waveformDefault: Required<WaveformBase> = {
 
 const textDefault: Required<Text> = {
     text: "Hello, World!",
-    font: "helvetiker",
+    font: "gentilis",
     color: "#ffffff",
     size: 1,
     amplitude: 0,
@@ -61,12 +61,6 @@ const textDefault: Required<Text> = {
     rotationYAmplitude: 0,
     rotationZAmplitude: 0,
     depth: 0.1,
-    bevelEnabled: false,
-    bevelThickness: 0,
-    bevelSize: 0,
-    bevelSegments: 12,
-    curveSegments: 12,
-    steps: 12,
     ...transformDefaults,
     ...presetDefaults,
 };

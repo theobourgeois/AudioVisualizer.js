@@ -23,12 +23,6 @@ export const renderText: RenderFunc<"text"> = (settings, three, audioData, id) =
     rotationYAmplitude,
     rotationZAmplitude,
     depth,
-    bevelEnabled,
-    bevelThickness,
-    bevelSize,
-    bevelSegments,
-    curveSegments,
-    steps,
     color,
     amplitude,
     rotationX,
@@ -50,7 +44,6 @@ export const renderText: RenderFunc<"text"> = (settings, three, audioData, id) =
   const isLoading = mesh?.userData.loading;
 
   if (!mesh || (isDataChanged && !isLoading)) {
-    console.log("Creating new text mesh");
     if (!mesh) {
       mesh = new THREE.Mesh();
       mesh.name = id;
@@ -64,12 +57,6 @@ export const renderText: RenderFunc<"text"> = (settings, three, audioData, id) =
         font: fontFile,
         size,
         depth,
-        curveSegments,
-        bevelEnabled,
-        bevelThickness,
-        bevelSize,
-        bevelSegments,
-        steps,
       });
       const material = new THREE.MeshBasicMaterial({ color });
 
@@ -88,12 +75,6 @@ export const renderText: RenderFunc<"text"> = (settings, three, audioData, id) =
           font,
           size,
           depth,
-          curveSegments,
-          bevelEnabled,
-          bevelThickness,
-          bevelSize,
-          bevelSegments,
-          steps,
           color,
         },
       };

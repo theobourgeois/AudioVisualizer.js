@@ -54,12 +54,6 @@ export type Text = PresetBase & Transform & {
   rotationXAmplitude?: number;
   rotationYAmplitude?: number;
   rotationZAmplitude?: number;
-  bevelEnabled?: boolean;
-  bevelThickness?: number;
-  bevelSize?: number;
-  bevelSegments?: number;
-  curveSegments?: number;
-  steps?: number;
   depth?: number;
   amplitude?: number;
 };
@@ -82,8 +76,8 @@ export type WaveformBase = PresetBase & Transform & {
   invert?: boolean;
 };
 
-type Waveform = WaveformBase;
-type LineWaveform = WaveformBase;
+export type Waveform = WaveformBase;
+export type LineWaveform = WaveformBase;
 
 // Define LayerSettings based on Preset
 export type LayerSettings<T extends Preset> = T extends "shape"
@@ -99,7 +93,7 @@ export type LayerSettings<T extends Preset> = T extends "shape"
   : never;
 
 // Define the Layer type with proper discrimination
-type Layer<T extends Preset> = {
+export type Layer<T extends Preset> = {
   id?: number;
   preset: T;
   settings: LayerSettings<T>;
@@ -132,7 +126,7 @@ export type DefaultValues = {
 
 // Props for the AudioVisualizer
 export type AudioVisualizerProps = {
-  audioRef?: React.RefObject<HTMLAudioElement>;
+  audioRef?: React.RefObject<HTMLAudioElement | null>;
   src?: string;
   style?: React.CSSProperties;
   className?: string;

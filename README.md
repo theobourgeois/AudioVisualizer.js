@@ -26,41 +26,71 @@ npm install audio-visualizer.js
 import React, { useRef } from "react";
 import { AudioVisualizer } from "audio-visualizer.js";
 
-const App = () => {
-  const audioRef = useRef(null);
+const config = [
+  {
+    preset: "waveform",
+    settings: {
+      color: "rgb(79,70,229)",
+      amplitude: 10,
+      y: -3.8,
+      domainType: "frequency",
+    },
+  },
+  {
+    preset: "waveform",
+    settings: {
+      color: "rgb(79,70,229)",
+      amplitude: 10,
+      y: 3.8,
+      domainType: "frequency",
+      invert: true,
+    },
+  },
+  {
+    preset: "waveform",
+    settings: {
+      color: "rgb(79,70,229)",
+      amplitude: 100,
+      domainType: "time",
+      circle: true,
+    },
+  },
+  {
+    preset: "text",
+    settings: {
+      text: "audio-visualizer.js",
+      color: "rgb(79,70,229)",
+      font: "helvetiker",
+      rotationYAmplitude: 10,
+      rotationXAmplitude: 1,
+      amplitude: 0.1,
+      size: 1,
+      domainType: "frequency",
+    },
+  },
+  {
+    preset: "light",
+    settings: {
+      color: "#4C51BF",
+      intensity: 0.5,
+    },
+  },
+];
 
-  const config = {
-    layers: [
-      {
-        preset: "Shape3D",
-        settings: {
-          shape: "sphere",
-          color: "#ff0000",
-          amplitude: 5,
-          size: 2,
-        },
-      },
-      {
-        preset: "Waveform",
-        settings: {
-          color: "#00ff00",
-          amplitude: 3,
-          period: 1,
-          lineWidth: 2,
-        },
-      },
-    ],
-  };
+export default function App() {
+  const audioRef = useRef(null);
 
   return (
     <div>
-      <audio ref={audioRef} src="path/to/audio.mp3" controls />
+      <audio ref={audioRef} src="path/to/audio.mp3" />
+      {/* using audio ref */}
       <AudioVisualizer audioRef={audioRef} config={config} backgroundColor="#000" />
+
+      {/* using audio src */}
+      <AudioVisualizer src="path/to/audio.mp3" config={config} backgroundColor="#000" />
     </div>
   );
 };
-
-export default App;
 ```
 
 ### Available Props
